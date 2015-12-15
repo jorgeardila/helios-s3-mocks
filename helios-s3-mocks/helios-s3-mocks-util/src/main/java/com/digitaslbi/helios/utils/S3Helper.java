@@ -29,6 +29,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.digitaslbi.helios.constants.Constants;
 import com.digitaslbi.helios.dto.File;
 import com.digitaslbi.helios.dto.Folder;
+import org.apache.commons.compress.utils.IOUtils;
 
 /**
  *
@@ -221,16 +222,20 @@ public class S3Helper {
 	    }
 	}
     
-    public static InputStream getObject(String key) {
-		try {
+    public static File getObject(String key) {
+    	File aux;
+    	try {
 			log.info("Downloading an object");
-            
+			aux = new File();
+			
 			S3Object s3object = s3Client.getObject(new GetObjectRequest(S3Properties.getInstance().getBucketName(), key));
 			
 			log.info("Content-Type: "  + s3object.getObjectMetadata().getContentType());
-            //displayTextInputStream(s3object.getObjectContent());
+			aux.setPath(s3object.getKey());
+			aux.setIsFile(true);
+			aux.setContent(IOUtils.toByteArray(s3object.getObjectContent()));
             
-            return s3object.getObjectContent();            
+            return aux;            
         } catch (AmazonServiceException ase) {
         	log.error("Caught an AmazonServiceException, which" +
             		" means your request made it " +

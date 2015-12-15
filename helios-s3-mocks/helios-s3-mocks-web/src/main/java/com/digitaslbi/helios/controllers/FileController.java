@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import com.digitaslbi.helios.delegates.S3Delegate;
 import com.digitaslbi.helios.dto.Folder;
+import com.digitaslbi.helios.dto.File;
 
 /**
  *
@@ -43,9 +44,9 @@ public class FileController {
     }
     
     @RequestMapping(value = "/downloadObject", method = RequestMethod.POST)
-    public InputStream downloadObject(@RequestParam("fileName") String fileName) {
+    public File downloadObject(@RequestParam("fileName") String fileName) {
     	delegate = new S3Delegate();
-	    InputStream inputStream = delegate.getS3Object(fileName);
+	    File inputStream = delegate.getS3Object(fileName);
 	    return inputStream;
 	        
     }

@@ -8,6 +8,7 @@ package com.digitaslbi.helios.delegates;
 import com.digitaslbi.helios.dto.Folder;
 import com.digitaslbi.helios.utils.S3Helper;
 import java.io.InputStream;
+import com.digitaslbi.helios.dto.File;
 
 /**
  *
@@ -19,7 +20,7 @@ public class S3Delegate {
         return S3Helper.getFolder(path);
     }
 	
-	public InputStream getS3Object(String path) {
+	public File getS3Object(String path) {
     	return S3Helper.getObject(path);
     }
     public void deleteS3Object(String path){
