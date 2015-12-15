@@ -5,10 +5,9 @@
  */
 package com.digitaslbi.helios.delegates;
 
+import com.digitaslbi.helios.dto.File;
 import com.digitaslbi.helios.dto.Folder;
 import com.digitaslbi.helios.utils.S3Helper;
-import java.io.InputStream;
-import com.digitaslbi.helios.dto.File;
 
 /**
  *
@@ -23,13 +22,16 @@ public class S3Delegate {
 	public File getS3Object(String path) {
     	return S3Helper.getObject(path);
     }
-    public void deleteS3Object(String path){
+	
+    public void deleteS3Object(String path) {
     	S3Helper.deleteFolder(path);
     }
-    public void uploadObject(String folderName, InputStream filePath){
-    	S3Helper.uploadFile(folderName,filePath);
+    
+    public void uploadObject(String folderName, byte[] content) {
+    	S3Helper.uploadFile(folderName, content);
     }
-    public void createFolder(String folderName){
+    
+    public void createFolder(String folderName) {
     	S3Helper.createFolder(folderName);
     }
     

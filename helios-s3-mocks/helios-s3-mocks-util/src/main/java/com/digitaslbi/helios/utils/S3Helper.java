@@ -137,6 +137,7 @@ public class S3Helper {
 
     public static void createFolder(String folderName) {
     	connect();
+    	
     	// create meta-data for your folder and set content-length to 0
     	ObjectMetadata metadata = new ObjectMetadata();
     	metadata.setContentLength(0);
@@ -145,15 +146,14 @@ public class S3Helper {
     	InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
     	
     	// create a PutObjectRequest passing the folder name suffixed by /
-    	PutObjectRequest putObjectRequest = new PutObjectRequest(S3Properties.getInstance().getBucketName(),
-    				folderName + Constants.AWS_PARENT_DELIMITER.getValue(), emptyContent, metadata);
+		PutObjectRequest putObjectRequest = new PutObjectRequest(S3Properties.getInstance().getBucketName(),
+				folderName + Constants.AWS_PARENT_DELIMITER.getValue(), emptyContent, metadata);
     	
     	// send request to S3 to create folder
     	try{
     		s3Client.putObject(putObjectRequest);
-	    } 
-    	catch (AmazonServiceException ase) {
-    		log.error("Caught an AmazonServiceException, which " +
+	    } catch (AmazonServiceException ase) {
+    		log.error("[S3Helper][createFolder] Caught an AmazonServiceException, which " +
 	        		"means your request made it " +
 	                "to Amazon S3, but was rejected with an error response" +
 	                " for some reason.");
@@ -163,7 +163,7 @@ public class S3Helper {
     		log.error("Error Type:       " + ase.getErrorType());
     		log.error("Request ID:       " + ase.getRequestId());
 	    } catch (AmazonClientException ace) {
-	    	log.error("Caught an AmazonClientException, which " +
+	    	log.error("[S3Helper][createFolder] Caught an AmazonClientException, which " +
 	        		"means the client encountered " +
 	                "an internal error while trying to " +
 	                "communicate with S3, " +
@@ -171,17 +171,23 @@ public class S3Helper {
 	    	log.error("Error Message: " + ace.getMessage());
 	    }
     }
-    
-    public static void uploadFile(String folderName, InputStream file) {
+
+    public static void uploadFile(String fileName, byte[] content) {
     	connect();
+
     	ObjectMetadata metadata = new ObjectMetadata();
-    	metadata.setContentLength(0);
+    	metadata.setContentLength(content.length);
+
     	try {
-    		log.info("Uploading a new object to S3 from a file\n");
-    		//java.io.File file = new java.io.File(file);
-    		s3Client.putObject(new PutObjectRequest(S3Properties.getInstance().getBucketName(), folderName,file,metadata).withCannedAcl(CannedAccessControlList.PublicRead));
+    		log.info("[S3Helper][uploadFile] Uploading a new object to S3: " + fileName);
+    		
+			PutObjectRequest putObjectRequest = new PutObjectRequest(S3Properties.getInstance().getBucketName(),
+					fileName, new ByteArrayInputStream(content), metadata);
+    		putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
+    		
+			s3Client.putObject(putObjectRequest);
          } catch (AmazonServiceException ase) {
-        	 log.error("Caught an AmazonServiceException, which " +
+        	 log.error("[S3Helper][uploadFile] Caught an AmazonServiceException, which " +
             		"means your request made it " +
                     "to Amazon S3, but was rejected with an error response" +
                     " for some reason.");
@@ -191,7 +197,7 @@ public class S3Helper {
         	 log.error("Error Type:       " + ase.getErrorType());
         	 log.error("Request ID:       " + ase.getRequestId());
         } catch (AmazonClientException ace) {
-        	log.error("Caught an AmazonClientException, which " +
+        	log.error("[S3Helper][uploadFile] Caught an AmazonClientException, which " +
             		"means the client encountered " +
                     "an internal error while trying to " +
                     "communicate with S3, " +
@@ -199,7 +205,7 @@ public class S3Helper {
         	log.error("Error Message: " + ace.getMessage());
         }
     }
-    
+
 	public static void deleteFolder(String folderName) {
 		connect();
 		List<S3ObjectSummary> fileList = s3Client.listObjects(S3Properties.getInstance().getBucketName(), folderName).getObjectSummaries();
@@ -212,24 +218,24 @@ public class S3Helper {
 			s3Client.deleteObject(S3Properties.getInstance().getBucketName(), folderName);
 			
 		} catch (AmazonServiceException ase) {
-			log.error("Caught an AmazonServiceException.");
+			log.error("[S3Helper][deleteFolder] Caught an AmazonServiceException.");
 			log.error("Error Message:    " + ase.getMessage());
 			log.error("HTTP Status Code: " + ase.getStatusCode());
 			log.error("AWS Error Code:   " + ase.getErrorCode());
 			log.error("Error Type:       " + ase.getErrorType());
 			log.error("Request ID:       " + ase.getRequestId());
 	    } catch (AmazonClientException ace) {
-	    	log.error("Caught an AmazonClientException.");
+	    	log.error("[S3Helper][deleteFolder] Caught an AmazonClientException.");
 	    	log.error("Error Message: " + ace.getMessage());
 	    }
 	}
-    
+
     public static File getObject(String key) {
     	connect();
-    	File aux;
+    	
     	try {
-			log.info("Downloading an object");
-			aux = new File();
+			log.info("[S3Helper][getObject] Downloading an object");
+			File aux = new File();
 			
 			S3Object s3object = s3Client.getObject(new GetObjectRequest(S3Properties.getInstance().getBucketName(), key));
 			
@@ -238,10 +244,9 @@ public class S3Helper {
 			aux.setIsFile(true);
 			aux.setContent(org.apache.commons.io.IOUtils.toByteArray(s3object.getObjectContent()));
 			
-            
             return aux;            
         } catch (AmazonServiceException ase) {
-        	log.error("Caught an AmazonServiceException, which" +
+        	log.error("[S3Helper][getObject] Caught an AmazonServiceException, which" +
             		" means your request made it " +
                     "to Amazon S3, but was rejected with an error response" +
                     " for some reason.");
@@ -251,20 +256,17 @@ public class S3Helper {
         	log.error("Error Type:       " + ase.getErrorType());
         	log.error("Request ID:       " + ase.getRequestId());
         } catch (AmazonClientException ace) {
-        	log.error("Caught an AmazonClientException, which means"+
+        	log.error("[S3Helper][getObject] Caught an AmazonClientException, which means"+
             		" the client encountered " +
                     "an internal error while trying to " +
                     "communicate with S3, " +
                     "such as not being able to access the network.");
         	log.error("Error Message: " + ace.getMessage());
-        }
-    	catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        } catch (IOException e) {
+    		log.error("[S3Helper][getObject] Error: " + e);
 		}
 		
 		return null;
 	}
-
 
 }
