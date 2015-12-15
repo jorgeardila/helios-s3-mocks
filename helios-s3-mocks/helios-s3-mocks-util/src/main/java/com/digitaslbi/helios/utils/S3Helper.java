@@ -136,6 +136,7 @@ public class S3Helper {
     
 
     public static void createFolder(String folderName) {
+    	connect();
     	// create meta-data for your folder and set content-length to 0
     	ObjectMetadata metadata = new ObjectMetadata();
     	metadata.setContentLength(0);
@@ -172,7 +173,7 @@ public class S3Helper {
     }
     
     public static void uploadFile(String folderName, InputStream file) {
-    	
+    	connect();
     	ObjectMetadata metadata = new ObjectMetadata();
     	metadata.setContentLength(0);
     	try {
@@ -200,6 +201,7 @@ public class S3Helper {
     }
     
 	public static void deleteFolder(String folderName) {
+		connect();
 		List<S3ObjectSummary> fileList = s3Client.listObjects(S3Properties.getInstance().getBucketName(), folderName).getObjectSummaries();
 		
 		try{
@@ -223,6 +225,7 @@ public class S3Helper {
 	}
     
     public static File getObject(String key) {
+    	connect();
     	File aux;
     	try {
 			log.info("Downloading an object");
