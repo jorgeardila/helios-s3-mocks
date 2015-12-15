@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -29,7 +30,6 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.digitaslbi.helios.constants.Constants;
 import com.digitaslbi.helios.dto.File;
 import com.digitaslbi.helios.dto.Folder;
-import org.apache.commons.compress.utils.IOUtils;
 
 /**
  *
@@ -233,7 +233,8 @@ public class S3Helper {
 			log.info("Content-Type: "  + s3object.getObjectMetadata().getContentType());
 			aux.setPath(s3object.getKey());
 			aux.setIsFile(true);
-			aux.setContent(IOUtils.toByteArray(s3object.getObjectContent()));
+			aux.setContent(org.apache.commons.io.IOUtils.toByteArray(s3object.getObjectContent()));
+			
             
             return aux;            
         } catch (AmazonServiceException ase) {
@@ -254,6 +255,10 @@ public class S3Helper {
                     "such as not being able to access the network.");
         	log.error("Error Message: " + ace.getMessage());
         }
+    	catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return null;
 	}
