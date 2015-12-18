@@ -45,9 +45,9 @@ public class FileController {
     @RequestMapping(value = "/downloadObject", method = RequestMethod.POST)
     public File downloadObject(@RequestParam("fileName") String fileName) {
     	delegate = new S3Delegate();
-	    File inputStream = delegate.getS3Object(fileName);
+	    File file = delegate.getS3Object(fileName);
 	    
-	    return inputStream;	        
+	    return file;	        
     }
 
     @RequestMapping(value = "/deleteFolder",method = RequestMethod.GET)

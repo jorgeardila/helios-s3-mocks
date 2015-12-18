@@ -17,7 +17,7 @@ public class File implements Comparable<File>{
     
     private boolean isFile;
     
-    private byte[] content;
+    private String content;
 
     @Override
     public int compareTo(File o) {
@@ -73,14 +73,14 @@ public class File implements Comparable<File>{
     /**
      * @return the content
      */
-    public byte[] getContent() {
+    public String getContent() {
         return content;
     }
 
     /**
      * @param content the content to set
      */
-    public void setContent(byte[] content) {
+    public void setContent(String content) {
         this.content = content;
     }
 

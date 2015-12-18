@@ -8,6 +8,8 @@ package com.digitaslbi.helios.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.InputStream;
@@ -235,14 +237,16 @@ public class S3Helper {
     	
     	try {
 			log.info("[S3Helper][getObject] Downloading an object");
-			File aux = new File();
-			
+
 			S3Object s3object = s3Client.getObject(new GetObjectRequest(S3Properties.getInstance().getBucketName(), key));
+			byte[] contentBytes = IOUtils.toByteArray(s3object.getObjectContent());
 			
 			log.info("Content-Type: "  + s3object.getObjectMetadata().getContentType());
+			
+			File aux = new File();
 			aux.setPath(s3object.getKey());
 			aux.setIsFile(true);
-			aux.setContent(org.apache.commons.io.IOUtils.toByteArray(s3object.getObjectContent()));
+			aux.setContent(new String(Base64.encodeBase64String(contentBytes)));
 			
             return aux;            
         } catch (AmazonServiceException ase) {
