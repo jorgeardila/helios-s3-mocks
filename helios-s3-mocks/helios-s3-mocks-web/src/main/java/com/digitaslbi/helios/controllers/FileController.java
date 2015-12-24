@@ -51,14 +51,14 @@ public class FileController {
     }
 
     @RequestMapping(value = "/deleteFolder",method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void deleteObject(@RequestParam("fileName") String fileName){
     	delegate = new S3Delegate();
     	delegate.deleteS3Object(fileName);
     }
 
     @RequestMapping(value = "/uploadObject",method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public void uploadObject(@RequestParam("fileName") String fileName, @RequestParam("file") MultipartFile file) {
     	try {
     		delegate = new S3Delegate();
@@ -72,7 +72,7 @@ public class FileController {
     }
 
     @RequestMapping(value = "/createFolder",method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public void createFolder(@RequestParam("folderName") String folderName) {
     	delegate = new S3Delegate();
     	delegate.createFolder(folderName);

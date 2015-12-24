@@ -14,7 +14,8 @@ public class TestClient {
 
 	public static void main(String[] args) {
 		try {
-			String URL = "http://127.0.0.1:8080/helios-s3-mocks-web-1.0-SNAPSHOT";
+			String URL = "http://127.0.0.1:8080/";
+			
 			HeliosS3MocksClient s3Client = new HeliosS3MocksClient(URL);
 			
 			Folder folder = s3Client.getFolder("tryme/");
@@ -27,7 +28,21 @@ public class TestClient {
 		    String content = IOUtils.toString(new ByteArrayInputStream(contentBytes));
 		    System.out.println("File: " + file.getPath());
 		    System.out.println("Content: " + content + "\n");
+
+			//-------------------
+		    
+		    boolean isFolderCreated = s3Client.createFolder("exampleFolder/");
+		    if(isFolderCreated) {
+				System.out.println("Folder created. \n");
+			}
 			
+			//-------------------
+			
+		    boolean isFolderDeleted = s3Client.deleteFolder("exampleFolder/");
+		    if(isFolderDeleted) {
+				System.out.println("Folder deleted. \n");
+			}
+		    
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

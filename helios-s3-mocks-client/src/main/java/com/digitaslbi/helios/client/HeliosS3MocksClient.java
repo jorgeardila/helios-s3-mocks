@@ -16,9 +16,13 @@ import com.google.gson.Gson;
 public class HeliosS3MocksClient {
 	final static String GET_FOLDER_SERVICE = "getFolder";
 	final static String DOWNLOAD_OBJECT_SERVICE = "downloadObject";
+	final static String CREATE_FOLDER_SERVICE = "/createFolder";
+	final static String DELETE_FOLDER_SERVICE = "/deleteFolder";
 	
 	final static String PATH_PARAM = "path";
 	final static String FILE_NAME_PARAM = "fileName";
+	final static String FOLDER_NAME_PARAM = "folderName";
+	
 	final static int OK_CODE = 200;
 	
 	private String url;
@@ -73,5 +77,41 @@ public class HeliosS3MocksClient {
 	    }
 	    
 	    return file;
+	}
+	
+	public boolean createFolder(String folderName) {
+		Client client = ClientBuilder.newClient();
+		WebTarget webTarget = client.target(this.url);
+		
+		WebTarget serviceWebTarget = webTarget.path(CREATE_FOLDER_SERVICE);
+		WebTarget serviceWebTargetWithParam = serviceWebTarget.queryParam(FOLDER_NAME_PARAM, folderName);
+		
+		Invocation.Builder invocationBuilder = serviceWebTargetWithParam.request(MediaType.APPLICATION_JSON_TYPE);
+		
+		Response response = invocationBuilder.get();
+		
+		if(response.getStatus() == OK_CODE) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean deleteFolder(String fileName) {
+		Client client = ClientBuilder.newClient();
+		WebTarget webTarget = client.target(this.url);
+		
+		WebTarget serviceWebTarget = webTarget.path(DELETE_FOLDER_SERVICE);
+		WebTarget serviceWebTargetWithParam = serviceWebTarget.queryParam(FILE_NAME_PARAM, fileName);
+		
+		Invocation.Builder invocationBuilder = serviceWebTargetWithParam.request(MediaType.APPLICATION_JSON_TYPE);
+		
+		Response response = invocationBuilder.get();
+		
+		if(response.getStatus() == OK_CODE) {
+			return true;
+		}
+		
+		return false;
 	}
 }
