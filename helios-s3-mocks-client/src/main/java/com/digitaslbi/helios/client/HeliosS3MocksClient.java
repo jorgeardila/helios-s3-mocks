@@ -9,6 +9,11 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.MultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
+
 import com.digitaslbi.helios.dto.File;
 import com.digitaslbi.helios.dto.Folder;
 import com.google.gson.Gson;
@@ -18,10 +23,12 @@ public class HeliosS3MocksClient {
 	final static String DOWNLOAD_OBJECT_SERVICE = "downloadObject";
 	final static String CREATE_FOLDER_SERVICE = "/createFolder";
 	final static String DELETE_FOLDER_SERVICE = "/deleteFolder";
+	final static String UPLOAD_OBJECT_SERVICE = "/uploadObject";
 	
 	final static String PATH_PARAM = "path";
 	final static String FILE_NAME_PARAM = "fileName";
 	final static String FOLDER_NAME_PARAM = "folderName";
+	final static String FILE_PARAM = "file";
 	
 	final static int OK_CODE = 200;
 	
@@ -114,4 +121,34 @@ public class HeliosS3MocksClient {
 		
 		return false;
 	}
+	
+	public boolean uploadObject(String fileName, String localFilePath) {
+		Client client = ClientBuilder.newClient();
+		client = client.register(MultiPartFeature.class);
+
+		WebTarget webTarget = client.target(this.url);
+		WebTarget serviceWebTarget = webTarget.path(UPLOAD_OBJECT_SERVICE);
+
+		MultiPart multiPart = new MultiPart();
+		multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
+
+		FormDataBodyPart formDataBodyPart = new FormDataBodyPart("fileName", fileName);
+		multiPart.bodyPart(formDataBodyPart);
+
+		FileDataBodyPart fileDataBodyPart = new FileDataBodyPart("file", 
+									new java.io.File(localFilePath), 
+									MediaType.APPLICATION_OCTET_STREAM_TYPE);
+		multiPart.bodyPart(fileDataBodyPart);
+
+		Invocation.Builder invocationBuilder = serviceWebTarget.request(MediaType.APPLICATION_JSON_TYPE);
+
+		Response response = invocationBuilder.post(Entity.entity(multiPart, multiPart.getMediaType()));
+
+		if (response.getStatus() == OK_CODE) {
+			return true;
+		}
+
+		return false;
+	}
+	
 }
